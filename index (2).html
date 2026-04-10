@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Intranet WiFi — Powered by Sblendern</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@300;400;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#07041a;--bg2:#0c0828;
+      --purple:#7b2ff7;--purple2:#9d4edd;
+      --blue:#2979ff;--blue2:#448aff;
+      --cyan:#00e5ff;--pink:#e040fb;
+      --green:#00e676;--white:#ffffff;
+      --soft:#b0aed0;
+      --card:rgba(20,10,50,0.72);
+      --border:rgba(123,47,247,0.35);
+      --glow-p:rgba(123,47,247,0.5);
+      --glow-b:rgba(41,121,255,0.5);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;}
+
+    .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(123,47,247,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,0.07) 1px,transparent 1px);background-size:48px 48px;}
+    .bg-floor{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(rgba(123,47,247,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,0.1) 1px,transparent 1px);background-size:55px 55px;transform:perspective(550px) rotateX(60deg);transform-origin:bottom center;opacity:0.45;}
+    .bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse 75% 48% at 50% 5%,rgba(123,47,247,0.28),transparent 65%),radial-gradient(ellipse 40% 35% at 0% 100%,rgba(41,121,255,0.18),transparent 60%),radial-gradient(ellipse 40% 35% at 100% 100%,rgba(224,64,251,0.14),transparent 60%);}
+    .neon-line{position:absolute;width:3px;height:68%;top:16%;opacity:0.65;}
+    .neon-line.l1{left:5%;background:linear-gradient(180deg,transparent,var(--pink),transparent);box-shadow:0 0 16px var(--pink);transform:skewX(-8deg);}
+    .neon-line.r1{right:5%;background:linear-gradient(180deg,transparent,var(--cyan),transparent);box-shadow:0 0 16px var(--cyan);transform:skewX(8deg);}
+    .neon-line.l2{left:11%;background:linear-gradient(180deg,transparent,var(--purple),transparent);box-shadow:0 0 10px var(--purple);opacity:0.35;transform:skewX(-8deg);}
+    .neon-line.r2{right:11%;background:linear-gradient(180deg,transparent,var(--blue),transparent);box-shadow:0 0 10px var(--blue);opacity:0.35;transform:skewX(8deg);}
+    .scan{position:fixed;top:-3px;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanAnim 9s linear infinite;z-index:1;opacity:0.3;}
+    @keyframes scanAnim{from{top:-3px;}to{top:100vh;}}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 5%;background:rgba(7,4,26,0.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+    .nav-brand{display:flex;align-items:center;gap:11px;text-decoration:none;}
+    .nav-s{width:42px;height:42px;flex-shrink:0;}
+    .brand-text{display:flex;flex-direction:column;}
+    .brand-main{font-family:'Orbitron',sans-serif;font-weight:900;font-size:15px;letter-spacing:2px;color:#fff;}
+    .brand-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--purple2);letter-spacing:2px;}
+    .nav-links{display:flex;gap:24px;list-style:none;align-items:center;}
+    .nav-links a{color:var(--soft);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:color .2s;}
+    .nav-links a:hover{color:var(--cyan);}
+    .nav-cta{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff!important;padding:9px 22px;border-radius:7px;box-shadow:0 0 18px var(--glow-p);}
+
+    /* TICKER */
+    .ticker{position:relative;z-index:10;background:rgba(123,47,247,0.18);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;margin-top:68px;}
+    .ticker-track{display:flex;gap:60px;animation:tickMove 26s linear infinite;white-space:nowrap;}
+    .t-item{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;flex-shrink:0;}
+    .t-item::before{content:'◆  ';font-size:8px;color:var(--purple2);}
+    @keyframes tickMove{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+    /* HERO */
+    .hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px 60px;}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(123,47,247,0.2),rgba(41,121,255,0.2));border:1px solid rgba(123,47,247,0.4);border-radius:999px;padding:7px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .6s ease both;}
+    .eyebrow-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+    .hero-logo-svg{width:160px;height:160px;margin:0 auto 24px;animation:fadeUp .7s .05s ease both,floatY 4s ease-in-out infinite;filter:drop-shadow(0 0 28px var(--glow-p)) drop-shadow(0 0 56px rgba(41,121,255,0.28));}
+    @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+    .powered-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px;animation:fadeUp .65s .08s ease both;}
+    .powered-lbl{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--soft);text-transform:uppercase;}
+    .powered-name{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,var(--purple2),var(--blue2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(38px,8vw,88px);font-weight:900;letter-spacing:4px;line-height:1.0;animation:fadeUp .7s .1s ease both;}
+    .w1{color:#fff;text-shadow:0 0 40px rgba(255,255,255,0.15);}
+    .w2{background:linear-gradient(90deg,var(--cyan),var(--purple2),var(--blue2),var(--cyan));background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerTxt 4s linear infinite;}
+    @keyframes shimmerTxt{0%{background-position:300% 0;}100%{background-position:-300% 0;}}
+    .wifi-arc{display:inline-block;position:relative;}
+    .wifi-arc::before{content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:22px;height:12px;border:3px solid var(--cyan);border-bottom:none;border-radius:50% 50% 0 0;box-shadow:0 0 10px var(--cyan);animation:warcPulse 2s ease-in-out infinite;}
+    @keyframes warcPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+    .hero-sub{font-size:clamp(13px,1.8vw,16px);color:var(--soft);margin-top:20px;max-width:600px;line-height:1.8;animation:fadeUp .7s .2s ease both;}
+    .hero-sub strong{color:var(--cyan);}
+    .free-pill{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:12px 32px;background:linear-gradient(135deg,#00c853,#00e676);color:#04061a;font-family:'Orbitron',sans-serif;font-weight:900;font-size:14px;letter-spacing:3px;text-transform:uppercase;border-radius:10px;box-shadow:0 0 30px rgba(0,230,118,0.5);animation:fadeUp .7s .3s ease both,glowGreen 2.5s ease-in-out infinite;}
+    @keyframes glowGreen{0%,100%{box-shadow:0 0 25px rgba(0,230,118,0.5);}50%{box-shadow:0 0 50px rgba(0,230,118,0.8);}}
+    .hero-cta-row{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s .4s ease both;}
+    .btn-main{padding:14px 34px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;box-shadow:0 0 24px var(--glow-p);transition:transform .2s,box-shadow .2s;}
+    .btn-main:hover{transform:translateY(-3px);box-shadow:0 0 40px var(--glow-p);}
+    .btn-ghost{padding:14px 34px;border-radius:9px;background:transparent;border:2px solid var(--purple2);color:var(--purple2);font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+    .btn-ghost:hover{background:rgba(123,47,247,0.15);color:#fff;}
+
+    /* SECTION */
+    section{position:relative;z-index:2;padding:80px 5%;}
+    .sec-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--purple2);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;}
+    .sec-title{font-family:'Orbitron',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;text-align:center;letter-spacing:2px;margin-bottom:12px;}
+    .sec-desc{text-align:center;color:var(--soft);max-width:560px;margin:0 auto 48px;font-size:14px;line-height:1.8;}
+
+    /* PLANS */
+    #plans{background:rgba(12,8,40,0.6);}
+    .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;max-width:980px;margin:0 auto;}
+    .plan-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 28px;text-align:center;backdrop-filter:blur(14px);position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;}
+    .plan-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .plan-card:hover{transform:translateY(-10px);box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 40px rgba(123,47,247,0.18);}
+    .p-green{border-color:rgba(0,230,118,0.4);}.p-green::before{background:linear-gradient(90deg,#00c853,var(--cyan));}
+    .p-blue{border-color:rgba(41,121,255,0.5);}.p-blue::before{background:linear-gradient(90deg,var(--blue),var(--cyan));}
+    .p-purple{border-color:rgba(157,78,221,0.5);}.p-purple::before{background:linear-gradient(90deg,var(--purple),var(--pink));}
+    .plan-popular{position:absolute;top:14px;right:-30px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04061a;font-size:9px;font-weight:900;letter-spacing:1px;padding:4px 42px;transform:rotate(45deg);text-transform:uppercase;}
+    .plan-gauge{width:80px;height:60px;margin:0 auto 14px;}
+    .plan-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+    .p-green .plan-name{color:#00e676;}.p-blue .plan-name{color:var(--blue2);}.p-purple .plan-name{color:var(--purple2);}
+    .plan-price{font-family:'Orbitron',sans-serif;font-size:52px;font-weight:900;color:#fff;line-height:1;}
+    .plan-price sup{font-size:22px;vertical-align:top;margin-top:10px;display:inline-block;color:var(--cyan);}
+    .plan-price span{font-size:16px;color:var(--soft);font-family:'Nunito',sans-serif;font-weight:400;}
+    .plan-div{height:1px;background:var(--border);margin:20px 0;}
+    .plan-feats{list-style:none;text-align:left;display:flex;flex-direction:column;gap:14px;}
+    .plan-feats li{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--soft);}
+    .plan-feats li strong{color:#fff;}
+    .fdot{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;}
+    .p-green .fdot{background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.35);color:#00e676;}
+    .p-blue  .fdot{background:rgba(41,121,255,0.12);border:1px solid rgba(41,121,255,0.35);color:var(--blue2);}
+    .p-purple .fdot{background:rgba(157,78,221,0.12);border:1px solid rgba(157,78,221,0.35);color:var(--purple2);}
+    .plan-btn{display:block;width:100%;margin-top:26px;padding:13px;background:transparent;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .3s;}
+    .p-green  .plan-btn{border:2px solid #00e676;color:#00e676;}
+    .p-green  .plan-btn:hover{background:#00e676;color:#04061a;box-shadow:0 0 24px rgba(0,230,118,0.5);}
+    .p-blue   .plan-btn{border:2px solid var(--blue2);color:var(--blue2);}
+    .p-blue   .plan-btn:hover{background:linear-gradient(135deg,var(--blue),var(--cyan));border-color:transparent;color:#fff;box-shadow:0 0 24px var(--glow-b);}
+    .p-purple .plan-btn{border:2px solid var(--purple2);color:var(--purple2);}
+    .p-purple .plan-btn:hover{background:linear-gradient(135deg,var(--purple),var(--purple2));border-color:transparent;color:#fff;box-shadow:0 0 24px var(--glow-p);}
+
+    /* PERKS */
+    .perks-bar{max-width:980px;margin:28px auto 0;background:rgba(20,10,50,0.8);border:1px solid var(--border);border-radius:16px;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;backdrop-filter:blur(10px);}
+    .perk{padding:22px 16px;text-align:center;border-right:1px solid var(--border);transition:background .2s;}
+    .perk:last-child{border-right:none;}
+    .perk:hover{background:rgba(123,47,247,0.1);}
+    .perk-ico{display:flex;justify-content:center;margin-bottom:10px;}
+    .perk-title{font-size:12px;font-weight:800;color:#fff;letter-spacing:.5px;margin-bottom:4px;}
+    .perk-sub{font-size:11px;color:var(--soft);line-height:1.4;}
+
+    /* APPLY */
+    .apply-wrap{position:relative;z-index:2;text-align:center;padding:40px 5%;}
+    .apply-btn{display:inline-flex;align-items:center;gap:14px;padding:18px 54px;border-radius:12px;background:linear-gradient(135deg,#00c853,#00b4d8);color:#04061a;font-family:'Orbitron',sans-serif;font-weight:900;font-size:18px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;box-shadow:0 0 40px rgba(0,200,83,0.5);transition:transform .2s,box-shadow .2s;}
+    .apply-btn:hover{transform:translateY(-4px);box-shadow:0 0 60px rgba(0,200,83,0.7);}
+    .arr{font-size:22px;animation:arrPulse 1.2s ease-in-out infinite;}
+    @keyframes arrPulse{0%,100%{transform:translateX(0);}50%{transform:translateX(6px);}}
+
+    /* CONTACT */
+    #contact{background:rgba(7,4,26,0.7);}
+    .contact-box{max-width:820px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:48px 40px;backdrop-filter:blur(16px);box-shadow:0 24px 70px rgba(0,0,0,0.4),0 0 40px rgba(123,47,247,0.07);}
+    .loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:30px;}
+    .loc-card{background:rgba(123,47,247,0.08);border:1px solid rgba(123,47,247,0.25);border-radius:14px;padding:20px 18px;}
+    .loc-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--purple2);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .loc-tag::before{content:'';width:14px;height:1px;background:var(--purple2);}
+    .loc-name{font-weight:800;font-size:13px;color:#fff;margin-bottom:4px;}
+    .loc-addr{font-size:12px;color:var(--soft);line-height:1.6;}
+    .c-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(123,47,247,0.13);}
+    .c-row:last-of-type{border-bottom:none;}
+    .c-icon{width:44px;height:44px;flex-shrink:0;background:rgba(123,47,247,0.15);border:1px solid rgba(123,47,247,0.35);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+    .c-icon svg{width:22px;height:22px;}
+    .c-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--purple2);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+    .c-val{font-size:14px;color:#fff;font-weight:700;}
+    .c-val a{color:var(--cyan);text-decoration:none;}
+    .c-val a:hover{text-decoration:underline;}
+    .cta-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center;}
+    .cta-a{padding:13px 30px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;box-shadow:0 0 22px var(--glow-p);transition:transform .2s;}
+    .cta-a:hover{transform:translateY(-2px);}
+    .cta-b{padding:13px 30px;border-radius:8px;background:transparent;border:2px solid var(--purple2);color:var(--purple2);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+    .cta-b:hover{background:rgba(123,47,247,0.15);color:#fff;}
+
+    /* FOOTER */
+    footer{position:relative;z-index:2;background:rgba(7,4,26,0.96);border-top:1px solid var(--border);padding:22px 5%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+    .foot-copy{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--soft);}
+    .foot-copy span{color:var(--purple2);}
+    .foot-tags{display:flex;gap:8px;flex-wrap:wrap;}
+    .f-tag{padding:4px 12px;border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--soft);font-family:'Share Tech Mono',monospace;letter-spacing:1px;text-transform:uppercase;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+    @media(max-width:680px){
+      .nav-links{display:none;}
+      .loc-grid{grid-template-columns:1fr;}
+      .contact-box{padding:28px 18px;}
+      .perks-bar{grid-template-columns:1fr 1fr;}
+      .perk{border-bottom:1px solid var(--border);}
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-floor"></div>
+  <div class="bg-glow"></div>
+  <div class="neon-line l1"></div>
+  <div class="neon-line r1"></div>
+  <div class="neon-line l2"></div>
+  <div class="neon-line r2"></div>
+</div>
+<div class="scan"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <svg class="nav-s" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="ng" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stop-color="#b06cff"/>
+          <stop offset="100%" stop-color="#2979ff"/>
+        </radialGradient>
+      </defs>
+      <circle cx="21" cy="21" r="20" fill="url(#ng)" stroke="rgba(0,229,255,0.55)" stroke-width="1.5"/>
+      <ellipse cx="15" cy="12" rx="8" ry="5" fill="rgba(255,255,255,0.12)"/>
+      <text x="21" y="28" font-family="Orbitron,sans-serif" font-size="19" font-weight="900" text-anchor="middle" fill="white" style="filter:drop-shadow(0 0 5px #fff)">S</text>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-main">INTRANET</span>
+      <span class="brand-sub">Powered by Sblendern</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#plans">Plans</a></li>
+    <li><a href="#contact">Locations</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Apply Now</a></li>
+  </ul>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="t-item">FREE INSTALLATION</span>
+    <span class="t-item">NO CONTRACT NEEDED</span>
+    <span class="t-item">PLAN 1000 — 60 MBPS</span>
+    <span class="t-item">PLAN 1300 — 100 MBPS</span>
+    <span class="t-item">PLAN 1500 — 200 MBPS</span>
+    <span class="t-item">BINALONAN · LAOAC · URDANETA · PANGASINAN</span>
+    <span class="t-item">NO HIDDEN CHARGES</span>
+    <span class="t-item">QUICK CUSTOMER SERVICE</span>
+    <span class="t-item">FREE INSTALLATION</span>
+    <span class="t-item">NO CONTRACT NEEDED</span>
+    <span class="t-item">PLAN 1000 — 60 MBPS</span>
+    <span class="t-item">PLAN 1300 — 100 MBPS</span>
+    <span class="t-item">PLAN 1500 — 200 MBPS</span>
+    <span class="t-item">BINALONAN · LAOAC · URDANETA · PANGASINAN</span>
+    <span class="t-item">NO HIDDEN CHARGES</span>
+    <span class="t-item">QUICK CUSTOMER SERVICE</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow"><div class="eyebrow-dot"></div>Now Serving Pangasinan</div>
+
+  <!-- Big S Logo SVG -->
+  <svg class="hero-logo-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="hg1" cx="38%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#c084fc"/>
+        <stop offset="45%" stop-color="#7b2ff7"/>
+        <stop offset="100%" stop-color="#2979ff"/>
+      </radialGradient>
+      <radialGradient id="hshine" cx="35%" cy="28%" r="40%">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+      <linearGradient id="hring" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00e5ff"/>
+        <stop offset="50%" stop-color="#7b2ff7"/>
+        <stop offset="100%" stop-color="#e040fb"/>
+      </linearGradient>
+      <filter id="hglow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+    </defs>
+    <!-- Outer ring -->
+    <circle cx="80" cy="80" r="76" fill="none" stroke="url(#hring)" stroke-width="2" opacity="0.7"/>
+    <!-- Spinning accent arc -->
+    <path d="M80 6 A74 74 0 0 1 150 65" fill="none" stroke="rgba(0,229,255,0.5)" stroke-width="3" stroke-linecap="round">
+      <animateTransform attributeName="transform" type="rotate" from="0 80 80" to="360 80 80" dur="8s" repeatCount="indefinite"/>
+    </path>
+    <!-- Main circle -->
+    <circle cx="80" cy="80" r="68" fill="url(#hg1)" filter="url(#hglow)"/>
+    <!-- Hex pattern -->
+    <path d="M52 68 l14-8 l14 8 l0 16 l-14 8 l-14-8Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <path d="M80 52 l14-8 l14 8 l0 16 l-14 8 l-14-8Z" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <!-- Shine -->
+    <ellipse cx="60" cy="50" rx="26" ry="18" fill="url(#hshine)" opacity="0.6"/>
+    <!-- S letter shadow -->
+    <text x="82" y="104" font-family="Orbitron,sans-serif" font-size="78" font-weight="900" text-anchor="middle" fill="rgba(0,0,0,0.4)">S</text>
+    <!-- S letter chrome -->
+    <text x="80" y="102" font-family="Orbitron,sans-serif" font-size="78" font-weight="900" text-anchor="middle" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4">S</text>
+    <text x="80" y="102" font-family="Orbitron,sans-serif" font-size="78" font-weight="900" text-anchor="middle" fill="white" style="filter:drop-shadow(0 0 14px rgba(255,255,255,0.9)) drop-shadow(0 3px 8px rgba(0,0,0,0.7))">S</text>
+    <!-- Glint -->
+    <line x1="62" y1="46" x2="74" y2="58" stroke="rgba(255,255,255,0.55)" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Bottom text -->
+    <text x="80" y="130" font-family="Orbitron,sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" fill="rgba(255,255,255,0.65)" letter-spacing="2">INTRANET</text>
+    <text x="80" y="143" font-family="Orbitron,sans-serif" font-size="6.5" text-anchor="middle" fill="rgba(0,229,255,0.8)" letter-spacing="1.5">POWERED BY SBLENDERN</text>
+  </svg>
+
+  <div class="powered-row">
+    <span class="powered-lbl">Powered by</span>
+    <span class="powered-name">SBLENDERN I.T. SOLUTIONS</span>
+  </div>
+
+  <h1 class="hero-title">
+    <div class="w1">INTRANET</div>
+    <div class="w2"><span class="wifi-arc">WiFi</span></div>
+  </h1>
+
+  <p class="hero-sub">
+    For as low as <strong>₱1,000/month</strong>, enjoy unlimited high-speed internet
+    powered by <strong>Sblendern I.T. Solutions</strong> —
+    serving <strong>Urdaneta City, Binalonan, Laoac</strong>, Pangasinan.
+  </p>
+
+  <div class="free-pill">⚡ FREE INSTALLATION — LIMITED TIME!</div>
+
+  <div class="hero-cta-row">
+    <a href="#plans" class="btn-main">View Plans</a>
+    <a href="#contact" class="btn-ghost">Our Locations</a>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section id="plans">
+  <div class="sec-label">Subscription Plans</div>
+  <h2 class="sec-title">Choose Your Plan</h2>
+  <p class="sec-desc">All plans include <strong style="color:var(--green)">FREE installation</strong>. No contract. No hidden charges. One-time registration fee only.</p>
+
+  <div class="plans-grid">
+
+    <!-- PLAN 1000 -->
+    <div class="plan-card p-green">
+      <div class="plan-gauge">
+        <svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="gg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00c853"/><stop offset="100%" stop-color="#00e676"/></linearGradient></defs>
+          <path d="M8 48 A32 32 0 0 1 72 48" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M8 48 A32 32 0 0 1 50 18" fill="none" stroke="url(#gg1)" stroke-width="6" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #00e676)"/>
+          <circle cx="40" cy="48" r="4" fill="#00e676" style="filter:drop-shadow(0 0 6px #00e676)"/>
+          <line x1="40" y1="48" x2="24" y2="23" stroke="#00e676" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="40" y="38" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.45)">UP TO</text>
+          <text x="40" y="54" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="15" font-weight="900" fill="#00e676">60</text>
+        </svg>
+        <div style="text-align:center;font-size:10px;color:#00e676;letter-spacing:2px;font-family:'Share Tech Mono',monospace;margin-top:-2px;">MBPS</div>
+      </div>
+      <div class="plan-name">Plan 1000</div>
+      <div class="plan-price"><sup>₱</sup>1,000<span>/mo</span></div>
+      <div class="plan-div"></div>
+      <ul class="plan-feats">
+        <li><div class="fdot">📶</div>Up to <strong>60 Mbps</strong> speed</li>
+        <li><div class="fdot">📱</div>Up to <strong>6 Devices</strong> connected</li>
+        <li><div class="fdot">🔧</div><strong>Free</strong> Installation</li>
+        <li><div class="fdot">✅</div><strong>No</strong> Contract Needed</li>
+      </ul>
+      <a href="#contact" class="plan-btn">Apply Now</a>
+    </div>
+
+    <!-- PLAN 1300 -->
+    <div class="plan-card p-blue">
+      <div class="plan-popular">Most Popular</div>
+      <div class="plan-gauge">
+        <svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="gg2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2979ff"/><stop offset="100%" stop-color="#00e5ff"/></linearGradient></defs>
+          <path d="M8 48 A32 32 0 0 1 72 48" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M8 48 A32 32 0 0 1 62 22" fill="none" stroke="url(#gg2)" stroke-width="6" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #00e5ff)"/>
+          <circle cx="40" cy="48" r="4" fill="#00e5ff" style="filter:drop-shadow(0 0 6px #00e5ff)"/>
+          <line x1="40" y1="48" x2="58" y2="26" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="40" y="38" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.45)">UP TO</text>
+          <text x="40" y="54" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="15" font-weight="900" fill="#00e5ff">100</text>
+        </svg>
+        <div style="text-align:center;font-size:10px;color:#00e5ff;letter-spacing:2px;font-family:'Share Tech Mono',monospace;margin-top:-2px;">MBPS</div>
+      </div>
+      <div class="plan-name">Plan 1300</div>
+      <div class="plan-price"><sup>₱</sup>1,300<span>/mo</span></div>
+      <div class="plan-div"></div>
+      <ul class="plan-feats">
+        <li><div class="fdot">📶</div>Up to <strong>100 Mbps</strong> speed</li>
+        <li><div class="fdot">📱</div>Up to <strong>8 Devices</strong> connected</li>
+        <li><div class="fdot">🔧</div><strong>Free</strong> Installation</li>
+        <li><div class="fdot">✅</div><strong>No</strong> Contract Needed</li>
+      </ul>
+      <a href="#contact" class="plan-btn">Apply Now</a>
+    </div>
+
+    <!-- PLAN 1500 -->
+    <div class="plan-card p-purple">
+      <div class="plan-gauge">
+        <svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="gg3" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#9d4edd"/><stop offset="100%" stop-color="#e040fb"/></linearGradient></defs>
+          <path d="M8 48 A32 32 0 0 1 72 48" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M8 48 A32 32 0 1 1 72 48" fill="none" stroke="url(#gg3)" stroke-width="6" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #e040fb)"/>
+          <circle cx="40" cy="48" r="4" fill="#e040fb" style="filter:drop-shadow(0 0 6px #e040fb)"/>
+          <line x1="40" y1="48" x2="40" y2="17" stroke="#e040fb" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="40" y="38" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.45)">UP TO</text>
+          <text x="40" y="54" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="15" font-weight="900" fill="#e040fb">200</text>
+        </svg>
+        <div style="text-align:center;font-size:10px;color:#e040fb;letter-spacing:2px;font-family:'Share Tech Mono',monospace;margin-top:-2px;">MBPS</div>
+      </div>
+      <div class="plan-name">Plan 1500</div>
+      <div class="plan-price"><sup>₱</sup>1,500<span>/mo</span></div>
+      <div class="plan-div"></div>
+      <ul class="plan-feats">
+        <li><div class="fdot">📶</div>Up to <strong>200 Mbps</strong> speed</li>
+        <li><div class="fdot">📱</div>Up to <strong>10 Devices</strong> connected</li>
+        <li><div class="fdot">🔧</div><strong>Free</strong> Installation</li>
+        <li><div class="fdot">✅</div><strong>No</strong> Contract Needed</li>
+      </ul>
+      <a href="#contact" class="plan-btn">Apply Now</a>
+    </div>
+
+  </div>
+
+  <!-- PERKS BAR -->
+  <div class="perks-bar">
+    <div class="perk">
+      <div class="perk-ico">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 3L4 7.5V14C4 20.08 8.84 25.3 15 27C21.16 25.3 26 20.08 26 14V7.5L15 3Z" stroke="#2979ff" stroke-width="2" fill="rgba(41,121,255,0.1)"/>
+          <path d="M10 15l4 4 7-7" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="perk-title">No Contract</div>
+      <div class="perk-sub">No lock-in. Cancel anytime.</div>
+    </div>
+    <div class="perk">
+      <div class="perk-ico">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="6" width="24" height="20" rx="3" stroke="#9d4edd" stroke-width="2" fill="rgba(123,47,247,0.1)"/>
+          <line x1="3" y1="12" x2="27" y2="12" stroke="#9d4edd" stroke-width="2"/>
+          <line x1="9" y1="3" x2="9" y2="9" stroke="#9d4edd" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21" y1="3" x2="21" y2="9" stroke="#9d4edd" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="15" cy="20" r="2" fill="#e040fb"/>
+        </svg>
+      </div>
+      <div class="perk-title">One-Time Payment</div>
+      <div class="perk-sub">Registration fee only. Monthly after.</div>
+    </div>
+    <div class="perk">
+      <div class="perk-ico">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 3L6 17h9l-2 10 14-14h-9l1-10z" fill="rgba(0,230,118,0.12)" stroke="#00e676" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="perk-title">Quick Assist</div>
+      <div class="perk-sub">Fast & responsive customer service.</div>
+    </div>
+    <div class="perk">
+      <div class="perk-ico">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="15" cy="15" r="12" stroke="#00e5ff" stroke-width="2" fill="rgba(0,229,255,0.08)"/>
+          <line x1="7" y1="7" x2="23" y2="23" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="15" y="19" text-anchor="middle" font-family="Nunito,sans-serif" font-size="9" fill="rgba(0,229,255,0.5)" font-weight="900">₱</text>
+        </svg>
+      </div>
+      <div class="perk-title">No Hidden Charges</div>
+      <div class="perk-sub">Transparent pricing, always.</div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLY NOW -->
+<div class="apply-wrap">
+  <a href="#contact" class="apply-btn">
+    APPLY NOW <span class="arr">→</span>
+  </a>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sec-label">Get Connected</div>
+  <h2 class="sec-title">Visit Us / Contact Us</h2>
+  <p class="sec-desc">Drop by any of our offices or reach out via phone and Facebook. We'll get you connected fast!</p>
+
+  <div class="contact-box">
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--purple2);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+      <!-- Location icon inline -->
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#9d4edd"/></svg>
+      Our Offices
+    </div>
+
+    <div class="loc-grid">
+      <div class="loc-card">
+        <div class="loc-tag">Main Office — Binalonan</div>
+        <div class="loc-name">Thess Building</div>
+        <div class="loc-addr">Poblacion, Binalonan<br/>Infront PNP Binalonan<br/>Pangasinan, Philippines</div>
+      </div>
+      <div class="loc-card">
+        <div class="loc-tag">Branch — Laoac</div>
+        <div class="loc-name">Obusan Building</div>
+        <div class="loc-addr">2nd Floor, Obusan Bldg.<br/>Poblacion, Laoac<br/>Pangasinan, Philippines</div>
+      </div>
+    </div>
+
+    <!-- Call -->
+    <div class="c-row">
+      <div class="c-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.47 11.47 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1C9.61 21 3 14.39 3 6a1 1 0 011-1h3.5a1 1 0 011 1 11.47 11.47 0 00.57 3.58 1 1 0 01-.25 1.01l-2.2 2.2z" fill="none" stroke="#9d4edd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="c-lbl">Call / Text</div>
+        <div class="c-val"><a href="tel:+639088909539">0908-890-9539</a> &nbsp;/&nbsp; <a href="tel:+639777660642">0977-766-0642</a></div>
+      </div>
+    </div>
+
+    <!-- Facebook -->
+    <div class="c-row">
+      <div class="c-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" stroke="#9d4edd" stroke-width="2" fill="rgba(123,47,247,0.1)"/>
+          <path d="M15.5 8H13.5C13.22 8 13 8.22 13 8.5V10.5H15.5L15 13H13V21H10V13H8V10.5H10V8.5C10 6.57 11.57 5 13.5 5H15.5V8Z" fill="#9d4edd"/>
+        </svg>
+      </div>
+      <div>
+        <div class="c-lbl">Facebook Page</div>
+        <div class="c-val"><a href="https://www.facebook.com/share/1BAY68tKS2/" target="_blank">Intranet — Powered by Sblendern</a></div>
+      </div>
+    </div>
+
+    <!-- Clock -->
+    <div class="c-row">
+      <div class="c-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="#9d4edd" stroke-width="2" fill="rgba(123,47,247,0.1)"/>
+          <path d="M12 7v5l3 3" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="1" fill="#00e5ff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="c-lbl">Office Hours</div>
+        <div class="c-val">Monday – Saturday &nbsp;|&nbsp; 8:00 AM – 6:00 PM</div>
+      </div>
+    </div>
+
+    <!-- Location areas -->
+    <div class="c-row" style="border-bottom:none;">
+      <div class="c-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="rgba(123,47,247,0.15)" stroke="#9d4edd" stroke-width="2"/>
+          <circle cx="12" cy="9" r="2.5" fill="#00e5ff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="c-lbl">Areas Served</div>
+        <div class="c-val">Urdaneta City · Binalonan · Laoac · Pangasinan</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="tel:+639088909539" class="cta-a">📞 Call Now</a>
+      <a href="https://www.facebook.com/share/1BAY68tKS2/" target="_blank" class="cta-b">💬 Message on Facebook</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-copy">© 2026 <span>Intranet WiFi — Sblendern I.T. Solutions</span> · Pangasinan, Philippines</div>
+  <div class="foot-tags">
+    <span class="f-tag">Plan 1000</span>
+    <span class="f-tag">Plan 1300</span>
+    <span class="f-tag">Plan 1500</span>
+    <span class="f-tag">Binalonan</span>
+    <span class="f-tag">Laoac</span>
+    <span class="f-tag">Urdaneta</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.plan-card,.contact-box,.perk,.loc-card').forEach((el,i)=>{
+    el.style.opacity='0';el.style.transform='translateY(28px)';
+    el.style.transition=`opacity .6s ${i*0.08}s ease, transform .6s ${i*0.08}s ease`;
+    io.observe(el);
+  });
+  setInterval(()=>{
+    const t=new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+    document.title=`Intranet WiFi · ${t}`;
+  },1000);
+</script>
+</body>
+</html>
